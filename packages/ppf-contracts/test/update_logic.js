@@ -22,7 +22,7 @@ contract('PPF, update logic', () => {
 
 	context('update-checks:', () => {
 		it('fails if base equals quote', async () => {
-			assertRevert(() => {
+			await assertRevert(() => {
 				return this.ppf.update(TOKEN_1, TOKEN_1, num(2), 1, SIG)
 			})
 		})
@@ -30,20 +30,21 @@ contract('PPF, update logic', () => {
 		it('fails if updating with past value', async () => {
 			await this.ppf.update(TOKEN_1, TOKEN_2, num(2), 5, SIG)
 			await this.ppf.update(TOKEN_1, TOKEN_3, num(2), 4, SIG) // can update another pair
-			assertRevert(() => {
+			
+			await assertRevert(() => {
 				return this.ppf.update(TOKEN_2, TOKEN_1, num(3), 4, SIG) // fails with a present pair
 			})
 		})
 
 		it('fails if updating to a time in the future', async () => {
-			assertRevert(() => {
+			await assertRevert(() => {
 				return this.ppf.update(TOKEN_1, TOKEN_2, num(3), 100+parseInt(+new Date()/1000), SIG)
 			})
 		})
 
 		it('fails if xrt is 0', async () => {
 			await this.ppf.update(TOKEN_1, TOKEN_2, 1, 5, SIG) // can set very low value
-			assertRevert(() => {
+			await assertRevert(() => {
 				return this.ppf.update(TOKEN_1, TOKEN_2, 0, 6, SIG) // fails on 0
 			})
 		})
