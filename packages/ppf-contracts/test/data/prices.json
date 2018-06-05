@@ -1,0 +1,402 @@
+[
+  {
+    "symbol": "BTC",
+    "price": 7453.87
+  },
+  {
+    "symbol": "LTC",
+    "price": 117.923
+  },
+  {
+    "symbol": "XRP",
+    "price": 0.662765
+  },
+  {
+    "symbol": "NXT",
+    "price": 0.141869
+  },
+  {
+    "symbol": "DOGE",
+    "price": 0.00365258
+  },
+  {
+    "symbol": "DGB",
+    "price": 0.0328923
+  },
+  {
+    "symbol": "RDD",
+    "price": 0.00617353
+  },
+  {
+    "symbol": "DASH",
+    "price": 312.684
+  },
+  {
+    "symbol": "MONA",
+    "price": 3.27534
+  },
+  {
+    "symbol": "MAID",
+    "price": 0.464598
+  },
+  {
+    "symbol": "XMR",
+    "price": 161.523
+  },
+  {
+    "symbol": "BCN",
+    "price": 0.00587595
+  },
+  {
+    "symbol": "BTS",
+    "price": 0.216149
+  },
+  {
+    "symbol": "XLM",
+    "price": 0.288576
+  },
+  {
+    "symbol": "SYS",
+    "price": 0.331904
+  },
+  {
+    "symbol": "XVG",
+    "price": 0.038451
+  },
+  {
+    "symbol": "NXS",
+    "price": 2.54146
+  },
+  {
+    "symbol": "USDT",
+    "price": 1.00096
+  },
+  {
+    "symbol": "XEM",
+    "price": 0.242863
+  },
+  {
+    "symbol": "ETH",
+    "price": 591.493
+  },
+  {
+    "symbol": "SC",
+    "price": 0.0147575
+  },
+  {
+    "symbol": "FCT",
+    "price": 16.1634
+  },
+  {
+    "symbol": "REP",
+    "price": 36.935
+  },
+  {
+    "symbol": "DCR",
+    "price": 97.483
+  },
+  {
+    "symbol": "PIVX",
+    "price": 3.71484
+  },
+  {
+    "symbol": "LSK",
+    "price": 8.94296
+  },
+  {
+    "symbol": "DGD",
+    "price": 151.361
+  },
+  {
+    "symbol": "STEEM",
+    "price": 2.29345
+  },
+  {
+    "symbol": "WAVES",
+    "price": 4.1223
+  },
+  {
+    "symbol": "ARDR",
+    "price": 0.235304
+  },
+  {
+    "symbol": "ETC",
+    "price": 15.0744
+  },
+  {
+    "symbol": "STRAT",
+    "price": 4.32632
+  },
+  {
+    "symbol": "NEO",
+    "price": 52.9359
+  },
+  {
+    "symbol": "ZEC",
+    "price": 232.915
+  },
+  {
+    "symbol": "GNT",
+    "price": 0.575782
+  },
+  {
+    "symbol": "MKR",
+    "price": 787.924
+  },
+  {
+    "symbol": "KMD",
+    "price": 2.54192
+  },
+  {
+    "symbol": "NANO",
+    "price": 3.77067
+  },
+  {
+    "symbol": "ARK",
+    "price": 2.31507
+  },
+  {
+    "symbol": "SKY",
+    "price": 22.9004
+  },
+  {
+    "symbol": "QTUM",
+    "price": 13.6124
+  },
+  {
+    "symbol": "BAT",
+    "price": 0.26742
+  },
+  {
+    "symbol": "AE",
+    "price": 3.2015
+  },
+  {
+    "symbol": "VERI",
+    "price": 83.2397
+  },
+  {
+    "symbol": "MIOTA",
+    "price": 1.70295
+  },
+  {
+    "symbol": "BNT",
+    "price": 4.09689
+  },
+  {
+    "symbol": "GXS",
+    "price": 3.70343
+  },
+  {
+    "symbol": "FUN",
+    "price": 0.0337854
+  },
+  {
+    "symbol": "SNT",
+    "price": 0.0942549
+  },
+  {
+    "symbol": "EOS",
+    "price": 13.7416
+  },
+  {
+    "symbol": "GAS",
+    "price": 19.0984
+  },
+  {
+    "symbol": "PPT",
+    "price": 12.0089
+  },
+  {
+    "symbol": "OMG",
+    "price": 11.0273
+  },
+  {
+    "symbol": "ETHOS",
+    "price": 2.17281
+  },
+  {
+    "symbol": "BCH",
+    "price": 1085.08
+  },
+  {
+    "symbol": "BNB",
+    "price": 14.5668
+  },
+  {
+    "symbol": "BTM",
+    "price": 0.641146
+  },
+  {
+    "symbol": "DCN",
+    "price": 0.000617793
+  },
+  {
+    "symbol": "ZRX",
+    "price": 1.2152
+  },
+  {
+    "symbol": "HSR",
+    "price": 7.42721
+  },
+  {
+    "symbol": "VEN",
+    "price": 3.86261
+  },
+  {
+    "symbol": "NAS",
+    "price": 7.12061
+  },
+  {
+    "symbol": "WTC",
+    "price": 11.4303
+  },
+  {
+    "symbol": "LRC",
+    "price": 0.498035
+  },
+  {
+    "symbol": "TRX",
+    "price": 0.0591981
+  },
+  {
+    "symbol": "KNC",
+    "price": 1.41905
+  },
+  {
+    "symbol": "SUB",
+    "price": 0.386517
+  },
+  {
+    "symbol": "KIN",
+    "price": 0.000189128
+  },
+  {
+    "symbol": "ADA",
+    "price": 0.210734
+  },
+  {
+    "symbol": "RHOC",
+    "price": 1.45446
+  },
+  {
+    "symbol": "CNX",
+    "price": 4.30939
+  },
+  {
+    "symbol": "ENG",
+    "price": 1.93577
+  },
+  {
+    "symbol": "AION",
+    "price": 2.09169
+  },
+  {
+    "symbol": "BTG",
+    "price": 44.6929
+  },
+  {
+    "symbol": "NULS",
+    "price": 3.74381
+  },
+  {
+    "symbol": "ICX",
+    "price": 2.6278
+  },
+  {
+    "symbol": "ETN",
+    "price": 0.0199564
+  },
+  {
+    "symbol": "QASH",
+    "price": 0.50583
+  },
+  {
+    "symbol": "BCD",
+    "price": 2.8768
+  },
+  {
+    "symbol": "DRGN",
+    "price": 0.594736
+  },
+  {
+    "symbol": "CMT",
+    "price": 0.32617
+  },
+  {
+    "symbol": "ELF",
+    "price": 1.02048
+  },
+  {
+    "symbol": "WICC",
+    "price": 1.83391
+  },
+  {
+    "symbol": "XIN",
+    "price": 673.892
+  },
+  {
+    "symbol": "MOAC",
+    "price": 5.54077
+  },
+  {
+    "symbol": "IOST",
+    "price": 0.0415166
+  },
+  {
+    "symbol": "THETA",
+    "price": 0.253323
+  },
+  {
+    "symbol": "ZIL",
+    "price": 0.121584
+  },
+  {
+    "symbol": "SOC",
+    "price": 0.172788
+  },
+  {
+    "symbol": "ELA",
+    "price": 39.6971
+  },
+  {
+    "symbol": "POLY",
+    "price": 0.65224
+  },
+  {
+    "symbol": "HT",
+    "price": 5.95869
+  },
+  {
+    "symbol": "FSN",
+    "price": 5.53671
+  },
+  {
+    "symbol": "ONT",
+    "price": 7.55518
+  },
+  {
+    "symbol": "BTCP",
+    "price": 20.3024
+  },
+  {
+    "symbol": "CENNZ",
+    "price": 0.19585
+  },
+  {
+    "symbol": "LOOM",
+    "price": 0.328384
+  },
+  {
+    "symbol": "WAN",
+    "price": 4.31224
+  },
+  {
+    "symbol": "MITH",
+    "price": 0.594858
+  },
+  {
+    "symbol": "CTXC",
+    "price": 1.26727
+  }
+]
