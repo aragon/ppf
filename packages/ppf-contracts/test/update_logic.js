@@ -1,3 +1,5 @@
+const { ONE, formatRate, parseRate } = require('@aragon/ppf.js')
+
 const { assertRevert } = require('./helpers/assertErrors')
 const priceData = require('./data/prices')
 
@@ -9,11 +11,8 @@ contract('PPF, update logic', () => {
 	const TOKEN_3 = '0xabcd'
 	const SIG = '0x'
 
-	const ONE = new web3.BigNumber(10).pow(18)
-	const num = x => new web3.BigNumber(x.toFixed(20)).mul(ONE)
-	const parseNum = x => x.div(ONE).toNumber().toFixed(4)
 	const assertBig = (x, c, s = 'number') => {
-		assert.equal(parseNum(x), c.toFixed(4), `${s} should have matched`)
+		assert.equal(parseRate(x), c.toFixed(4), `${s} should have matched`)
 	}
 
 	beforeEach(async () => {
@@ -23,22 +22,22 @@ contract('PPF, update logic', () => {
 	context('update-checks:', () => {
 		it('fails if base equals quote', async () => {
 			await assertRevert(() => {
-				return this.ppf.update(TOKEN_1, TOKEN_1, num(2), 1, SIG)
+				return this.ppf.update(TOKEN_1, TOKEN_1, formatRate(2), 1, SIG)
 			})
 		})
 
 		it('fails if updating with past value', async () => {
-			await this.ppf.update(TOKEN_1, TOKEN_2, num(2), 5, SIG)
-			await this.ppf.update(TOKEN_1, TOKEN_3, num(2), 4, SIG) // can update another pair
+			await this.ppf.update(TOKEN_1, TOKEN_2, formatRate(2), 5, SIG)
+			await this.ppf.update(TOKEN_1, TOKEN_3, formatRate(2), 4, SIG) // can update another pair
 			
 			await assertRevert(() => {
-				return this.ppf.update(TOKEN_2, TOKEN_1, num(3), 4, SIG) // fails with a present pair
+				return this.ppf.update(TOKEN_2, TOKEN_1, formatRate(3), 4, SIG) // fails with a present pair
 			})
 		})
 
 		it('fails if updating to a time in the future', async () => {
 			await assertRevert(() => {
-				return this.ppf.update(TOKEN_1, TOKEN_2, num(3), 100+parseInt(+new Date()/1000), SIG)
+				return this.ppf.update(TOKEN_1, TOKEN_2, formatRate(3), 100+parseInt(+new Date()/1000), SIG)
 			})
 		})
 
@@ -59,7 +58,7 @@ contract('PPF, update logic', () => {
 		})
 
 		it('updates feed', async () => {
-			await this.ppf.update(TOKEN_1, TOKEN_2, num(2), 1, SIG)
+			await this.ppf.update(TOKEN_1, TOKEN_2, formatRate(2), 1, SIG)
 
 			const [rate, when1] = await this.ppf.get.call(TOKEN_1, TOKEN_2)
 			const [inverseRate, when2] = await this.ppf.get.call(TOKEN_2, TOKEN_1)
@@ -72,7 +71,7 @@ contract('PPF, update logic', () => {
 		})
 
 		it('updates feed inversely', async () => {
-			await this.ppf.update(TOKEN_2, TOKEN_1, num(1/3), 1, SIG)
+			await this.ppf.update(TOKEN_2, TOKEN_1, formatRate(1/3), 1, SIG)
 
 			const [rate, when1] = await this.ppf.get.call(TOKEN_1, TOKEN_2)
 			const [inverseRate, when2] = await this.ppf.get.call(TOKEN_2, TOKEN_1)
@@ -82,9 +81,9 @@ contract('PPF, update logic', () => {
 		})
 
 		it('can update many pairs', async () => {
-			await this.ppf.update(TOKEN_1, TOKEN_2, num(1), 1, SIG)
-			await this.ppf.update(TOKEN_2, TOKEN_3, num(2), 2, SIG)
-			await this.ppf.update(TOKEN_1, TOKEN_3, num(3), 3, SIG)
+			await this.ppf.update(TOKEN_1, TOKEN_2, formatRate(1), 1, SIG)
+			await this.ppf.update(TOKEN_2, TOKEN_3, formatRate(2), 2, SIG)
+			await this.ppf.update(TOKEN_1, TOKEN_3, formatRate(3), 3, SIG)
 			
 			const [rate1, when1] = await this.ppf.get.call(TOKEN_2, TOKEN_1)
 			const [rate2, when2] = await this.ppf.get.call(TOKEN_3, TOKEN_2)
@@ -104,7 +103,7 @@ contract('PPF, update logic', () => {
 			const tokenAddress = i => `0xee${i}`
 
 			for (const [i, {price}] of priceData.entries()) {
-				await this.ppf.update(tokenAddress(i), USD, num(price), 1, SIG)
+				await this.ppf.update(tokenAddress(i), USD, formatRate(price), 1, SIG)
 				const [rate] = await this.ppf.get.call(USD, tokenAddress(i))
 				assertBig(rate, 1/price)
 			}
