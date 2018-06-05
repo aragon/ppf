@@ -52,7 +52,7 @@ contract('PPF, update logic', () => {
 
 	context('update:', () => {
 		it('rate is 0 before an update', async () => {
-			const [rate, when] = await this.ppf.get(TOKEN_1, TOKEN_2)
+			const [rate, when] = await this.ppf.get.call(TOKEN_1, TOKEN_2)
 
 			assert.equal(rate, 0, 'rate should be 0')
 			assert.equal(when, 0, 'when should be 0')
@@ -61,8 +61,8 @@ contract('PPF, update logic', () => {
 		it('updates feed', async () => {
 			await this.ppf.update(TOKEN_1, TOKEN_2, num(2), 1, SIG)
 
-			const [rate, when1] = await this.ppf.get(TOKEN_1, TOKEN_2)
-			const [inverseRate, when2] = await this.ppf.get(TOKEN_2, TOKEN_1)
+			const [rate, when1] = await this.ppf.get.call(TOKEN_1, TOKEN_2)
+			const [inverseRate, when2] = await this.ppf.get.call(TOKEN_2, TOKEN_1)
 
 			assertBig(rate, 2, 'rate')
 			assertBig(inverseRate, 0.5, 'inverse rate')
@@ -74,8 +74,8 @@ contract('PPF, update logic', () => {
 		it('updates feed inversely', async () => {
 			await this.ppf.update(TOKEN_2, TOKEN_1, num(1/3), 1, SIG)
 
-			const [rate, when1] = await this.ppf.get(TOKEN_1, TOKEN_2)
-			const [inverseRate, when2] = await this.ppf.get(TOKEN_2, TOKEN_1)
+			const [rate, when1] = await this.ppf.get.call(TOKEN_1, TOKEN_2)
+			const [inverseRate, when2] = await this.ppf.get.call(TOKEN_2, TOKEN_1)
 
 			assertBig(rate, 3, 'rate')
 			assertBig(inverseRate, 0.3333, 'inverse rate')
@@ -85,10 +85,10 @@ contract('PPF, update logic', () => {
 			await this.ppf.update(TOKEN_1, TOKEN_2, num(1), 1, SIG)
 			await this.ppf.update(TOKEN_2, TOKEN_3, num(2), 2, SIG)
 			await this.ppf.update(TOKEN_1, TOKEN_3, num(3), 3, SIG)
-
-			const [rate1, when1] = await this.ppf.get(TOKEN_2, TOKEN_1)
-			const [rate2, when2] = await this.ppf.get(TOKEN_3, TOKEN_2)
-			const [rate3, when3] = await this.ppf.get(TOKEN_3, TOKEN_1)
+			
+			const [rate1, when1] = await this.ppf.get.call(TOKEN_2, TOKEN_1)
+			const [rate2, when2] = await this.ppf.get.call(TOKEN_3, TOKEN_2)
+			const [rate3, when3] = await this.ppf.get.call(TOKEN_3, TOKEN_1)
 
 			assert.equal(when1, 1)
 			assert.equal(when2, 2)
@@ -105,7 +105,7 @@ contract('PPF, update logic', () => {
 
 			for (const [i, {price}] of priceData.entries()) {
 				await this.ppf.update(tokenAddress(i), USD, num(price), 1, SIG)
-				const [rate] = await this.ppf.get(USD, tokenAddress(i))
+				const [rate] = await this.ppf.get.call(USD, tokenAddress(i))
 				assertBig(rate, 1/price)
 			}
 		})
