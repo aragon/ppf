@@ -51,6 +51,13 @@ contract('PPF, update logic', () => {
 	})
 
 	context('update:', () => {
+		it('rate is 0 before an update', async () => {
+			const [rate, when] = await this.ppf.get(TOKEN_1, TOKEN_2)
+
+			assert.equal(rate, 0, 'rate should be 0')
+			assert.equal(when, 0, 'when should be 0')
+		})
+
 		it('updates feed', async () => {
 			await this.ppf.update(TOKEN_1, TOKEN_2, num(2), 1, SIG)
 
