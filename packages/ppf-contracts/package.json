@@ -1,0 +1,24 @@
+{
+  "name": "@aragon/ppf-contracts",
+  "version": "1.0.0",
+  "description": "Contracts for passive pricefeed",
+  "main": "index.js",
+  "scripts": {
+    "test": "truffle test",
+    "coverage": "solidity-coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aragon/ppf.git"
+  },
+  "author": "Aragon One AG",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/aragon/ppf/issues"
+  },
+  "homepage": "https://github.com/aragon/ppf#readme",
+  "devDependencies": {
+    "solidity-coverage": "^0.5.4",
+    "truffle": "^4.1.11"
+  }
+}
