@@ -33,7 +33,7 @@ contract PPF is Feed {
     }
     
     /**
-    * @notice Update the price for the `base + ':' + qoute` feed with an exchange rate of `xrt / ONE` for time `when`
+    * @notice Update the price for the `base + ':' + quote` feed with an exchange rate of `xrt / ONE` for time `when`
     * @dev If the number representation of base is lower than the one for quote, and update is cheaper, as less manipulation is required.
     * @param base Address for the base token in the feed
     * @param quote Address for the quote token the base is denominated in
@@ -50,7 +50,7 @@ contract PPF is Feed {
         require(base != quote); // Assumption that currency units are fungible and xrt should always be 1
         
         bytes32 h = setHash(base, quote, xrt, when);
-        require(h.personalRecover(sig) == operator); // Make sure the update is signed was signed by the operator
+        require(h.personalRecover(sig) == operator); // Make sure the update was signed by the operator
 
         feed[pair] = Price(pairXRT(base, quote, xrt), when);
         
