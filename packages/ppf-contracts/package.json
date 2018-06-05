@@ -5,12 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "truffle test",
-    "coverage": "solidity-coverage"
+    "compile": "truffle compile --all",
+    "coverage": "solidity-coverage",
+    "prepublish": "npm run compile"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aragon/ppf.git"
   },
+  "files": [
+    "build"
+  ],
   "author": "Aragon One AG",
   "license": "GPL-3.0",
   "bugs": {
@@ -18,6 +23,7 @@
   },
   "homepage": "https://github.com/aragon/ppf#readme",
   "devDependencies": {
+    "@aragon/ppf.js": "^1.0.0",
     "solidity-coverage": "^0.5.4",
     "truffle": "^4.1.11"
   }
