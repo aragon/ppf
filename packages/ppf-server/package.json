@@ -1,0 +1,22 @@
+{
+  "name": "@aragon/ppf-server",
+  "version": "1.0.0",
+  "description": "Fetch, sign and serve crypto prices",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aragon/ppf.git"
+  },
+  "author": "Aragon One AG",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/aragon/ppf/issues"
+  },
+  "homepage": "https://github.com/aragon/ppf#readme",
+  "dependencies": {
+    "request": "^2.87.0"
+  }
+}
