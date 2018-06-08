@@ -8,7 +8,7 @@ const updateFunction = ppfABI.find(x => x.name == 'update' && x.type == 'functio
 
 const HASH_ID = soliditySha3({ t: 'string', v: 'PPF-v1' })
 const ONE = new BigNumber(10).pow(18)
-const formatRate = n => new BigNumber(n.toFixed(20)).times(ONE)
+const formatRate = n => new BigNumber(n.toFixed(18)).times(ONE)
 const parseRate = x => x.div(ONE).toNumber().toFixed(4)
 
 const updateHash = (base, quote, xrt, when) => {

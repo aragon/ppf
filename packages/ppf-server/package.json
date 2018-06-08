@@ -4,7 +4,10 @@
   "description": "Fetch, sign and serve crypto prices",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run start:example",
+    "start:prod": "node index.js",
+    "start:example": "CONFIG=./config.example.js node index.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +20,8 @@
   },
   "homepage": "https://github.com/aragon/ppf#readme",
   "dependencies": {
-    "request": "^2.87.0"
+    "@aragon/ppf.js": "^1.0.0",
+    "request": "^2.87.0",
+    "web3-utils": "^1.0.0-beta.34"
   }
 }
