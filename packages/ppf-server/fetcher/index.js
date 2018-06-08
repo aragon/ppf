@@ -10,16 +10,16 @@ class Fetcher {
     this.state = {}
   }
 
+  start() {
+   this.pairs.forEach(pair => this._startPair(pair))
+  }
+
   _initServices(allServices) {
     const flattenedServices = allServices.reduce((acc, ss) => acc.concat(ss), [])
     const uniqueServices = Array.from(new Set(flattenedServices.map(({ service }) => service)))
 
     const init = s => new s()
     return uniqueServices.reduce((acc, s) => Object.assign({[s]: init(require(`./services/${s}`)) }, acc), {})
-  }
-
-  start() {
-   this.pairs.forEach(pair => this._startPair(pair))
   }
 
   async _startPair({ base, quote, services, requiredWeight, allowedDisparity, returnTimeout }) {
@@ -99,10 +99,6 @@ class Fetcher {
 
   _pairId(base, quote) {
     return `${base}:${quote}`
-  }
-
-  _priceId(base, quote, serviceName) {
-    return `${serviceName}-${this._pairId(base, quote)}`
   }
 
   _time() {
