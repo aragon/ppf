@@ -2,7 +2,7 @@ const tokenFromTicker = require('./helpers/tokenFromTicker')
 
 const standardConfig = {
   requiredWeight: 1,      // Proportion of the weight that needs to be updated to produce a value [0, 1]
-  allowedDisparity: 0.05, // Allowed disparity between services data [0, 1]
+  allowedDisparity: 0.04, // Allowed disparity between services data [0, 1]
   returnTimeout: 1,         // Seconds that the fetcher waits after a value is pulled before reducing all state and generating signature
   magnitude: 0,           // Difference in magnitude between base and quote (+x means base is expressed in x orders of magnitude more than quote) 
 }

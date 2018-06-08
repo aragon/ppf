@@ -87,8 +87,15 @@ class Fetcher {
     const updatedServices = servicesState.filter(({ expiry } ) => this._time() < expiry)
     const updatedWeight = updatedServices.reduce((acc, { weight }) => acc + weight, 0)
 
+    const minValue = updatedServices.slice(1).reduce((min, { price }) => Math.min(min, price), updatedServices[0].price)
+    const maxValue = updatedServices.slice(1).reduce((max, { price }) => Math.max(max, price), updatedServices[0].price)
+
+    const disparity = (maxValue - minValue) / maxValue
+
     if (updatedWeight < pairState.requiredWeight) {
-      console.log(`Processing ${base} ${quote}, cannot process price, insuficient weight ${updatedWeight}/${pairState.requiredWeight}`)
+      console.log(`${base} ${quote}, cannot process price, insuficient weight ${updatedWeight}/${pairState.requiredWeight}`)
+    } else if (disparity > pairState.allowedDisparity) {
+      console.log(`${base} ${quote}, cannot process price too much disparity between ${minValue} and ${maxValue} ${disparity}/${pairState.allowedDisparity}`)
     } else {
       const price = updatedServices.reduce((acc, { price, weight }) => acc + price * weight, 0)
       const weightedPrice = price / updatedWeight 
