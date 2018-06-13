@@ -13,6 +13,7 @@ const PPF = artifacts.require('PPF')
 contract('PPF, signature logic', ([operatorOwner, guy]) => {
 	const TOKEN_1 = '0x1234123412341234123412341234123412341234'
 	const TOKEN_2 = '0x5678567856785678567856785678567856785678'
+	const TOKEN_3 = '0xabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd'
 
 	const OPERATOR_PK = '0xb9694bb642e9721b2d5ed112a9114ff32f07f15b4a3b10a4e1651e9542c6fe2f'
 	const OPERATOR = '0x6ec28f4e814f88da2d981e6e787b786162006d39'
@@ -59,6 +60,45 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 
 		assert.equal(parseRate(r), xrt, 'rate should have been updated')
 		assert.equal(w, when, 'when should have been updated')
+	})
+
+	it('updates using update many for 1 update', async () => {
+		const xrt = 2
+		const when = 1
+
+		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+
+		await this.ppf.updateMany([TOKEN_1], [TOKEN_2], [formatRate(xrt)], [when], sig)
+
+		const [r, w] = await this.ppf.get.call(TOKEN_1, TOKEN_2)		
+
+		assert.equal(parseRate(r), xrt, 'rate should have been updated')
+		assert.equal(w, when, 'when should have been updated')
+	})
+
+	it('updates many', async () => {
+		const xrt = 2
+		const when = 1
+
+		const sig1 = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+		const sig2 = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_3, xrt, when)
+
+		const bases = [TOKEN_1, TOKEN_1]
+		const quotes = [TOKEN_2, TOKEN_3]
+		const rates = [formatRate(xrt), formatRate(xrt)]
+		const whens = [when, when]
+		const sigs = sig1 + sig2.slice(2) // concat removing 0x from the second
+
+		await this.ppf.updateMany(bases, quotes, rates, whens, sigs)
+
+		const [r, w] = await this.ppf.get.call(TOKEN_1, TOKEN_2)
+		const [r2, w2] = await this.ppf.get.call(TOKEN_1, TOKEN_2)	
+
+		assert.equal(parseRate(r), xrt, 'rate should have been updated')
+		assert.equal(w, when, 'when should have been updated')
+
+		assert.equal(parseRate(r2), xrt, 'rate should have been updated')
+		assert.equal(w2, when, 'when should have been updated')
 	})
 
 	it('allows old signature v value', async () => {

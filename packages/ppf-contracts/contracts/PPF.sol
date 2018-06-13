@@ -41,7 +41,7 @@ contract PPF is Feed {
     * @param when Timestamp for the exchange rate value
     * @param sig Signature payload (EIP191) from operator, concatenated [  r  ][  s  ][v]. See setHash function for the hash calculation. 
     */
-    function update(address base, address quote, uint128 xrt, uint64 when, bytes sig) external {
+    function update(address base, address quote, uint128 xrt, uint64 when, bytes sig) public {
         bytes32 pair = pairId(base, quote);
 
         // Ensure it is more recent than the current value (implicit check for > 0) and not a future date
@@ -55,6 +55,39 @@ contract PPF is Feed {
         feed[pair] = Price(pairXRT(base, quote, xrt), when);
         
         emit SetRate(base, quote, xrt, when);
+    }
+
+    /**
+    * @notice Update the price for many pairs
+    * @dev If the number representation of bases is lower than the one for quotes, and update is cheaper, as less manipulation is required.
+    * @param bases Array of addresses for the base tokens in the feed
+    * @param quotes Array of addresses for the quote tokens bases are denominated in
+    * @param xrts Array of the exchange rates for bases denominated in quotes. 10^18 is considered 1 to allow for decimal calculations
+    * @param whens Array of timestamps for the exchange rate value
+    * @param sigs Bytes array with the ordered concatenated signatures for the updates
+    */
+    function updateMany(address[] bases, address[] quotes, uint128[] xrts, uint64[] whens, bytes sigs) public {
+        require(bases.length != 0);
+        require(bases.length == quotes.length);
+        require(bases.length == xrts.length);
+        require(bases.length == whens.length);
+        require(bases.length == sigs.length / 65);
+        require(sigs.length % 65 == 0);
+        
+        for (uint256 i = 0; i < bases.length; i++) {
+            // Extract the signature for the update from the concatenated sigs
+            bytes memory sig = new bytes(65);
+            uint256 needle = 32 + 65 * i; // where to start copying from sigs
+            assembly {
+                // copy 32 bytes at a time and just the last byte at the end
+                mstore(add(sig, 0x20), mload(add(sigs, needle)))
+                mstore(add(sig, 0x40), mload(add(sigs, add(needle, 0x20))))
+                // we have to mload the last 32 bytes of the sig, and mstore8 just gets the LSB for the word
+                mstore8(add(sig, 0x60), mload(add(sigs, add(needle, 0x21))))
+            }
+            
+            update(bases[i], quotes[i], xrts[i], whens[i], sig);
+        }
     }
     
     /**
