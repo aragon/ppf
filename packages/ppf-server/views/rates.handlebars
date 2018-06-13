@@ -1,0 +1,21 @@
+<h1>Feed</h1>
+{{#each rates}}
+  <h3>{{ base }}:{{ quote }}</h3>
+  <h4>{{ price }} {{ quote }}</h4>
+  <p>Updated {{ date }}</p>
+{{/each}}
+
+<button id="send" onclick="sendTransaction()">Send update all tx</button>
+
+<script type="text/javascript">
+if (typeof web3 !== 'undefined') {
+  web3 = new Web3(web3.currentProvider);
+} else {
+  // set the provider you want from Web3.providers
+  web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+}
+
+function sendTransaction() {
+  web3.eth.sendTransaction({ to: '{{ ppf }}', data: '{{ calldata }}' }, console.log)
+}
+</script>
