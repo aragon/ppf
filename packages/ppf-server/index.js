@@ -1,10 +1,14 @@
 const express = require('express')
+const exphbs = require('express-handlebars')
 
 const Fetcher = require('./fetcher')
 const API = require('./api')
+const Web = require('./web')
 const PPF = require('@aragon/ppf.js')
 
 const app = express()
+app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars')
 
 const config = require(process.env.CONFIG)
 
@@ -47,7 +51,10 @@ const fetcher = new Fetcher(config, fetcherUpdate)
 fetcher.start()
 
 const api = API(requestData) 
-app.use(api)
+app.use('/api', api)
+
+const web = Web(requestData)
+app.use(web)
 
 const port = process.env.PORT || 3000
 app.listen(port, (err) => {
