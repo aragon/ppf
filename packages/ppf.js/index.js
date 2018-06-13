@@ -5,6 +5,7 @@ const abi = require('web3-eth-abi')
 
 const ppfABI = require('@aragon/ppf-contracts/build/contracts/PPF').abi
 const updateFunction = ppfABI.find(x => x.name == 'update' && x.type == 'function')
+const updateManyFunction = ppfABI.find(x => x.name == 'updateMany' && x.type == 'function')
 
 const HASH_ID = soliditySha3({ t: 'string', v: 'PPF-v1' })
 const ONE = new BigNumber(10).pow(18)
@@ -38,6 +39,17 @@ const computeUpdateCall = (pk, base, quote, xrt, when) => {
   return encodeCall(base, quote, xrt, when, sig)
 }
 
+const encodeManyCall = (bases, quotes, xrts, whens, sigs) => {
+  const concatenatedSigs = sigs.reduce((acc, sig) => acc + sig.slice(2), '0x')
+  const params = [ bases, quotes, xrts.map(x => formatRate(x)), whens, concatenatedSigs ]
+  return abi.encodeFunctionCall(updateManyFunction, params)
+}
+
+const computeUpdateManyCall = (pk, bases, quotes, xrts, whens) => {
+  const sigs = bases.map((_, i) => signUpdate(pk, bases[i], quotes[i], xrts[i], whens[i]))
+  return encodeManyCall(bases, quotes, xrts, whens, sigs)
+}
+
 module.exports = {
   HASH_ID,
   ONE,
@@ -47,4 +59,6 @@ module.exports = {
   signUpdate,
   computeUpdateCall,
   encodeCall,
+  computeUpdateManyCall,
+  encodeManyCall,   
 }
