@@ -1,6 +1,7 @@
 const {
 	signUpdate, 
-	computeUpdateCall, 
+	computeUpdateCall,
+	computeUpdateManyCall,
 	ONE, 
 	formatRate,
 	parseRate, 
@@ -36,6 +37,45 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		assert.equal(w, when, 'when should have been updated')
 	})
 
+	it('updates using update many for 1 update', async () => {
+		const xrt = 2
+		const when = 1
+
+		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+
+		await this.ppf.updateMany([TOKEN_1], [TOKEN_2], [formatRate(xrt)], [when], sig)
+
+		const [r, w] = await this.ppf.get.call(TOKEN_1, TOKEN_2)		
+
+		assert.equal(parseRate(r), xrt, 'rate should have been updated')
+		assert.equal(w, when, 'when should have been updated')
+	})
+
+	it('updates many', async () => {
+		const xrt = 4
+		const when = 1
+
+		const sig1 = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+		const sig2 = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_3, xrt, when)
+
+		const bases = [TOKEN_1, TOKEN_1]
+		const quotes = [TOKEN_2, TOKEN_3]
+		const rates = [formatRate(xrt), formatRate(xrt)]
+		const whens = [when, when]
+		const sigs = sig1 + sig2.slice(2) // concat removing 0x from the second
+
+		await this.ppf.updateMany(bases, quotes, rates, whens, sigs)
+
+		const [r, w] = await this.ppf.get.call(TOKEN_1, TOKEN_2)
+		const [r2, w2] = await this.ppf.get.call(TOKEN_1, TOKEN_2)	
+
+		assert.equal(parseRate(r), xrt, 'rate should have been updated')
+		assert.equal(w, when, 'when should have been updated')
+
+		assert.equal(parseRate(r2), xrt, 'rate should have been updated')
+		assert.equal(w2, when, 'when should have been updated')
+	})
+
 	it('updates with ppf.js generated call data', async () => {
 		const xrt = 3
 		const when = 1
@@ -45,7 +85,7 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		const tx = {
 			from: guy,
 			to: this.ppf.address,
-			gasLimit: 2e6, // solidity-coverage needs
+			gas: 2e6, // solidity-coverage needs
 			data
 		}
 
@@ -62,34 +102,30 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		assert.equal(w, when, 'when should have been updated')
 	})
 
-	it('updates using update many for 1 update', async () => {
-		const xrt = 2
+	it('updates many with ppf.js generated call data', async () => {
+		const xrt = 3
 		const when = 1
-
-		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
-
-		await this.ppf.updateMany([TOKEN_1], [TOKEN_2], [formatRate(xrt)], [when], sig)
-
-		const [r, w] = await this.ppf.get.call(TOKEN_1, TOKEN_2)		
-
-		assert.equal(parseRate(r), xrt, 'rate should have been updated')
-		assert.equal(w, when, 'when should have been updated')
-	})
-
-	it('updates many', async () => {
-		const xrt = 2
-		const when = 1
-
-		const sig1 = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
-		const sig2 = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_3, xrt, when)
 
 		const bases = [TOKEN_1, TOKEN_1]
 		const quotes = [TOKEN_2, TOKEN_3]
-		const rates = [formatRate(xrt), formatRate(xrt)]
+		const rates = [xrt, xrt]
 		const whens = [when, when]
-		const sigs = sig1 + sig2.slice(2) // concat removing 0x from the second
 
-		await this.ppf.updateMany(bases, quotes, rates, whens, sigs)
+		const data = computeUpdateManyCall(OPERATOR_PK, bases, quotes, rates, whens)
+
+		const tx = {
+			from: guy,
+			to: this.ppf.address,
+			gas: 4e6, // solidity-coverage needs
+			data
+		}
+
+		await new Promise((resolve, reject) => {
+			web3.eth.sendTransaction(tx, (err, hash) => {
+				if (err) return reject(err)
+				resolve(hash)
+			})
+		})
 
 		const [r, w] = await this.ppf.get.call(TOKEN_1, TOKEN_2)
 		const [r2, w2] = await this.ppf.get.call(TOKEN_1, TOKEN_2)	
