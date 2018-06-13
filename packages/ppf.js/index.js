@@ -46,4 +46,5 @@ module.exports = {
   updateHash,
   signUpdate,
   computeUpdateCall,
+  encodeCall,
 }
