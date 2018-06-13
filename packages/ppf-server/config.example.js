@@ -33,6 +33,7 @@ const fiatServicesConfig = [
 
 module.exports = {
   operatorKey: 'b9694bb642e9721b2d5ed112a9114ff32f07f15b4a3b10a4e1651e9542c6fe2f',
+  envs: [ 'mainnet', 'rinkeby' ],
   pairs: [
     {
       base: 'ANT',
