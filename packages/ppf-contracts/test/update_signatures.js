@@ -199,4 +199,30 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 			})
 		})
 	})
+
+	context('ppf-server sigs', () => {
+		const serverSigs = require('./data/ppf-server-sigs')
+
+		serverSigs.forEach(async ({ data, expects }, i) => {
+			it(`updates with ppf-server data #${i + 1}`, async () => {		
+				const tx = {
+					from: guy,
+					to: this.ppf.address,
+					gas: 4e6, // solidity-coverage needs
+					data
+				}
+
+				await new Promise((resolve, reject) => {
+					web3.eth.sendTransaction(tx, (err, hash) => {
+						if (err) return reject(err)
+						resolve(hash)
+					})
+				})
+
+				const [r] = await this.ppf.get.call(expects.base, expects.quote)		
+
+				assert.equal(parseRate(r), expects.price.toFixed(4), 'rate should have been updated')
+			})
+		})
+	})
 })
