@@ -21,7 +21,7 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		this.ppf = await PPF.new(OPERATOR, operatorOwner)
 	})
 
-	it('submits signed updated', async () => {
+	it('submits signed update', async () => {
 		const xrt = 2
 		const when = 1
 
