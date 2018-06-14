@@ -12,7 +12,7 @@ const ONE = new BigNumber(10).pow(18)
 const formatRate = n => new BigNumber(n.toFixed(20)).times(ONE)
 const parseRate = x => x.div(ONE).toNumber().toFixed(4)
 
-const updateHash = (base, quote, xrt, when) => {
+const updateDataHash = (base, quote, xrt, when) => {
   return soliditySha3(
     { t: 'bytes32', v: HASH_ID },
     { t: 'address', v: base },
@@ -22,32 +22,32 @@ const updateHash = (base, quote, xrt, when) => {
   )
 }
 
-const signUpdate = (pk, base, quote, xrt, when) => { 
+const signUpdateHash = (pk, base, quote, xrt, when) => { 
   pk = pk.replace(/^0x/, '') // remove 0x at the beginning
   const keyBuffer = Buffer.from(pk, 'hex')
-  const data = updateHash(base, quote, formatRate(xrt), when)
+  const data = updateDataHash(base, quote, formatRate(xrt), when)
   return sigs.personalSign(keyBuffer, { data })
 }
 
-const encodeCall = (base, quote, xrt, when, sig) => {
+const encodeUpdateCall = (base, quote, xrt, when, sig) => {
   const params = [ base, quote, formatRate(xrt), when, sig ]
   return abi.encodeFunctionCall(updateFunction, params)
 }
 
-const computeUpdateCall = (pk, base, quote, xrt, when) => {
-  const sig = signUpdate(pk, base, quote, xrt, when)
-  return encodeCall(base, quote, xrt, when, sig)
+const signAndEncodeUpdateCall = (pk, base, quote, xrt, when) => {
+  const sig = signUpdateHash(pk, base, quote, xrt, when)
+  return encodeUpdateCall(base, quote, xrt, when, sig)
 }
 
-const encodeManyCall = (bases, quotes, xrts, whens, sigs) => {
+const encodeUpdateManyCall = (bases, quotes, xrts, whens, sigs) => {
   const concatenatedSigs = sigs.reduce((acc, sig) => acc + sig.slice(2), '0x')
   const params = [ bases, quotes, xrts.map(x => formatRate(x)), whens, concatenatedSigs ]
   return abi.encodeFunctionCall(updateManyFunction, params)
 }
 
-const computeUpdateManyCall = (pk, bases, quotes, xrts, whens) => {
-  const sigs = bases.map((_, i) => signUpdate(pk, bases[i], quotes[i], xrts[i], whens[i]))
-  return encodeManyCall(bases, quotes, xrts, whens, sigs)
+const signAndEncodeUpdateManyCall = (pk, bases, quotes, xrts, whens) => {
+  const sigs = bases.map((_, i) => signUpdateHash(pk, bases[i], quotes[i], xrts[i], whens[i]))
+  return encodeUpdateManyCall(bases, quotes, xrts, whens, sigs)
 }
 
 module.exports = {
@@ -55,8 +55,10 @@ module.exports = {
   ONE,
   formatRate,
   parseRate,
-  updateHash,
-  signUpdate,
-  computeUpdateCall,
-  computeUpdateManyCall,
+  updateDataHash,
+  signUpdateHash,
+  encodeUpdateCall,
+  encodeUpdateManyCall,
+  signAndEncodeUpdateCall,
+  signAndEncodeUpdateManyCall,
 }
