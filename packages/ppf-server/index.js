@@ -1,5 +1,6 @@
 const express = require('express')
 const exphbs = require('express-handlebars')
+const tokenFromTicker = require('./helpers/tokenFromTicker')
 
 const Fetcher = require('./fetcher')
 const API = require('./api')
@@ -25,8 +26,9 @@ const pairId = (base, quote) => `${base}:${quote}`
 const fetcherUpdate = (err, { base, quote, price }) => {
   console.log(`Got price for ${base}: ${price} ${quote}`)
 
-  const getBaseToken = config.tokens[base] || config.tokens.default(base)
-  const getQuoteToken = config.tokens[quote] || config.tokens.default(quote)
+  const defaultToken = ticker => () => tokenFromTicker(ticker)
+  const getBaseToken = config.tokens[base] || defaultToken(base)
+  const getQuoteToken = config.tokens[quote] || defaultToken(quote)
 
   const when = parseInt(+new Date()/1000)
 

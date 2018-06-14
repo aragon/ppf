@@ -1,5 +1,3 @@
-const tokenFromTicker = require('./helpers/tokenFromTicker')
-
 const standardConfig = {
   requiredWeight: 1,      // Proportion of the weight that needs to be updated to produce a value [0, 1]
   allowedDisparity: 0.04, // Allowed disparity between services data [0, 1]
@@ -64,6 +62,5 @@ module.exports = {
   tokens: {
     ANT: n => n == 'mainnet' ? '0x960b236A07cf122663c4303350609A66A7B288C0' : '0x0D5263B7969144a852D58505602f630f9b20239D',
     ETH: () => '0x0000000000000000000000000000000000000000',
-    default: ticker => () => tokenFromTicker(ticker),
   }
 }
