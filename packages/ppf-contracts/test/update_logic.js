@@ -8,7 +8,7 @@ contract('PPF, update logic', () => {
 	const TOKEN_1 = '0x1234'
 	const TOKEN_2 = '0x5678'
 	const TOKEN_3 = '0xabcd'
-	const SIG = '0x'
+	const SIG = '0x' + '00'.repeat(65) // sig full of 0s
 
 	const assertBig = (x, c, s = 'formatRateber') => {
 		assert.equal(parseRate(x), c.toFixed(4), `${s} should have matched`)
@@ -16,39 +16,6 @@ contract('PPF, update logic', () => {
 
 	beforeEach(async () => {
 		this.ppf = await PPF.new()
-	})
-
-	context('update-checks:', () => {
-		it('fails if base equals quote', async () => {
-			await assertRevert(() => {
-				return this.ppf.update(TOKEN_1, TOKEN_1, formatRate(2), 1, SIG)
-			})
-		})
-
-		it('fails if updating with past value', async () => {
-			const T1 = 4
-			const T2 = 5
-
-			await this.ppf.update(TOKEN_1, TOKEN_2, formatRate(2), T2, SIG)
-			await this.ppf.update(TOKEN_1, TOKEN_3, formatRate(2), T1, SIG) // can update another pair
-			
-			await assertRevert(() => {
-				return this.ppf.update(TOKEN_2, TOKEN_1, formatRate(3), T1, SIG) // fails with a present pair
-			})
-		})
-
-		it('fails if updating to a time in the future', async () => {
-			await assertRevert(() => {
-				return this.ppf.update(TOKEN_1, TOKEN_2, formatRate(3), 100+parseInt(+new Date()/1000), SIG)
-			})
-		})
-
-		it('fails if xrt is 0', async () => {
-			await this.ppf.update(TOKEN_1, TOKEN_2, 1, 5, SIG) // can set very low value
-			await assertRevert(() => {
-				return this.ppf.update(TOKEN_1, TOKEN_2, 0, 6, SIG) // fails on 0
-			})
-		})
 	})
 
 	context('update:', () => {
@@ -130,6 +97,73 @@ contract('PPF, update logic', () => {
 				const [inverseRate] = await this.ppf.get.call(USD, tokenAddress(i))
 				assertBig(inverseRate, 1/price)
 			}
+		})
+	})
+
+	context('update-checks:', () => {
+		it('fails if base equals quote', async () => {
+			await assertRevert(() => {
+				return this.ppf.update(TOKEN_1, TOKEN_1, formatRate(2), 1, SIG)
+			})
+		})
+
+		it('fails if updating with past value', async () => {
+			await this.ppf.update(TOKEN_1, TOKEN_2, formatRate(2), 5, SIG)
+			await this.ppf.update(TOKEN_1, TOKEN_3, formatRate(2), 4, SIG) // can update another pair
+			
+			await assertRevert(() => {
+				return this.ppf.update(TOKEN_2, TOKEN_1, formatRate(3), 4, SIG) // fails with a present pair
+			})
+		})
+
+		it('fails if updating to a time in the future', async () => {
+			await assertRevert(() => {
+				return this.ppf.update(TOKEN_1, TOKEN_2, formatRate(3), 100+parseInt(+new Date()/1000), SIG)
+			})
+		})
+
+		it('fails if xrt is 0', async () => {
+			await this.ppf.update(TOKEN_1, TOKEN_2, 1, 5, SIG) // can set very low value
+			await assertRevert(() => {
+				return this.ppf.update(TOKEN_1, TOKEN_2, 0, 6, SIG) // fails on 0
+			})
+		})
+	})
+
+	context('updateMany-checks', () => {
+		const tests = [
+			{
+				title: 'updates 0 pairs',
+				args: [[], [], [], [], '0x'],
+			},
+			{
+				title: 'bases and quotes lengths missmatch',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2], [1, 1], [1, 1], SIG]
+			},
+			{ 
+				title: 'rates length missmatches',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1], [1, 1], SIG],
+			},
+			{
+				title: 'whens length missmatches',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1, 1], [1], SIG],
+			},
+			{
+				title: 'sigs length missmatches',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1, 1], [1, 1], SIG],
+			},
+			{
+				title: 'sigs length is incorrect',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1, 1], [1, 1], SIG + SIG.slice(2) + '01']
+			}
+		]
+
+		tests.forEach(({ title, args }) => {
+			it(`fails if ${title}`, async () => {
+				await assertRevert(() => {
+					return this.ppf.updateMany(...args)
+				})
+			})
 		})
 	})
 })
