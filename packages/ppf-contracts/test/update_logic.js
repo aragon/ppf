@@ -1,6 +1,5 @@
 const { ONE, formatRate, parseRate } = require('@aragon/ppf.js')
-
-const { assertRevert } = require('./helpers/assertErrors')
+const { assertRevert } = require('@aragon/test-helpers/assertThrow')
 const priceData = require('./data/prices')
 
 const PPF = artifacts.require('PPFNoSigMock')
@@ -11,7 +10,7 @@ contract('PPF, update logic', () => {
 	const TOKEN_3 = '0xabcd'
 	const SIG = '0x' + '00'.repeat(65) // sig full of 0s
 
-	const assertBig = (x, c, s = 'number') => {
+	const assertBig = (x, c, s = 'formatRateber') => {
 		assert.equal(parseRate(x), c.toFixed(4), `${s} should have matched`)
 	}
 
@@ -28,13 +27,15 @@ contract('PPF, update logic', () => {
 		})
 
 		it('updates feed', async () => {
-			await this.ppf.update(TOKEN_1, TOKEN_2, formatRate(2), 1, SIG)
+			const XRT = 2
+
+			await this.ppf.update(TOKEN_1, TOKEN_2, formatRate(XRT), 1, SIG)
 
 			const [rate, when1] = await this.ppf.get.call(TOKEN_1, TOKEN_2)
 			const [inverseRate, when2] = await this.ppf.get.call(TOKEN_2, TOKEN_1)
 
-			assertBig(rate, 2, 'rate')
-			assertBig(inverseRate, 0.5, 'inverse rate')
+			assertBig(rate, XRT, 'rate')
+			assertBig(inverseRate, 1/XRT, 'inverse rate')
 
 			assert.equal(when1.toString(), when2.toString(), 'updates must match')
 			assert.equal(when1, 1, 'update should be 1')
@@ -74,8 +75,27 @@ contract('PPF, update logic', () => {
 
 			for (const [i, {price}] of priceData.entries()) {
 				await this.ppf.update(tokenAddress(i), USD, formatRate(price), 1, SIG)
-				const [rate] = await this.ppf.get.call(USD, tokenAddress(i))
-				assertBig(rate, 1/price)
+				
+				const [rate] = await this.ppf.get.call(tokenAddress(i), USD)
+				assertBig(rate, price)
+
+				const [inverseRate] = await this.ppf.get.call(USD, tokenAddress(i))
+				assertBig(inverseRate, 1/price)
+			}
+		})
+
+		it('supports inverse CMC price data', async () => {
+			const USD = '0xff'
+			const tokenAddress = i => `0xee${i}`
+
+			for (const [i, {price}] of priceData.entries()) {
+				await this.ppf.update(USD, tokenAddress(i), formatRate(1/price), 1, SIG)
+				
+				const [rate] = await this.ppf.get.call(tokenAddress(i), USD)
+				assertBig(rate, price)
+
+				const [inverseRate] = await this.ppf.get.call(USD, tokenAddress(i))
+				assertBig(inverseRate, 1/price)
 			}
 		})
 	})
@@ -111,39 +131,38 @@ contract('PPF, update logic', () => {
 	})
 
 	context('updateMany-checks', () => {
-		it('fails updating 0 pairs', async () => {
-			await assertRevert(() => {
-				return this.ppf.updateMany([], [], [], [], '0x')
-			})
-		})
+		const tests = [
+			{
+				title: 'updates 0 pairs',
+				args: [[], [], [], [], '0x'],
+			},
+			{
+				title: 'bases and quotes lengths missmatch',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2], [1, 1], [1, 1], SIG]
+			},
+			{ 
+				title: 'rates length missmatches',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1], [1, 1], SIG],
+			},
+			{
+				title: 'whens length missmatches',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1, 1], [1], SIG],
+			},
+			{
+				title: 'sigs length missmatches',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1, 1], [1, 1], SIG],
+			},
+			{
+				title: 'sigs length is incorrect',
+				args: [[TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1, 1], [1, 1], SIG + SIG.slice(2) + '01']
+			}
+		]
 
-		it('fails if bases and quotes lengths missmatch', async () => {
-			await assertRevert(() => {
-				return this.ppf.updateMany([TOKEN_1, TOKEN_1], [TOKEN_2], [1, 1], [1, 1], SIG)
-			})
-		})
-
-		it('fails if rates length missmatches', async () => {
-			await assertRevert(() => {
-				return this.ppf.updateMany([TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1], [1, 1], SIG)
-			})
-		})
-
-		it('fails if whens length missmatches', async () => {
-			await assertRevert(() => {
-				return this.ppf.updateMany([TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1, 1], [1], SIG)
-			})
-		})
-
-		it('fails if sigs length missmatches', async () => {
-			await assertRevert(() => {
-				return this.ppf.updateMany([TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1, 1], [1, 1], SIG)
-			})
-		})
-
-		it('fails if sigs length is incorrect', async () => {
-			await assertRevert(() => {
-				return this.ppf.updateMany([TOKEN_1, TOKEN_1], [TOKEN_2, TOKEN_3], [1, 1], [1, 1], SIG + SIG.slice(2) + '01')
+		tests.forEach(({ title, args }) => {
+			it(`fails if ${title}`, async () => {
+				await assertRevert(() => {
+					return this.ppf.updateMany(...args)
+				})
 			})
 		})
 	})

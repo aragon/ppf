@@ -1,13 +1,13 @@
 const {
-	signUpdate, 
-	computeUpdateCall,
-	computeUpdateManyCall,
+	signUpdateHash, 
+	signAndEncodeUpdateCall,
+	signAndEncodeUpdateManyCall,
 	ONE, 
 	formatRate,
 	parseRate, 
 } = require('@aragon/ppf.js')
 
-const { assertRevert } = require('./helpers/assertErrors')
+const { assertRevert } = require('@aragon/test-helpers/assertThrow')
 
 const PPF = artifacts.require('PPF')
 
@@ -23,25 +23,11 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		this.ppf = await PPF.new(OPERATOR, operatorOwner)
 	})
 
-	it('submits signed updated', async () => {
-		const xrt = 2
-		const when = 1
-
-		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
-
-		await this.ppf.update(TOKEN_1, TOKEN_2, formatRate(xrt), when, sig)
-
-		const [r, w] = await this.ppf.get.call(TOKEN_1, TOKEN_2)		
-
-		assert.equal(parseRate(r), xrt, 'rate should have been updated')
-		assert.equal(w, when, 'when should have been updated')
-	})
-
 	it('updates using update many for 1 update', async () => {
 		const xrt = 2
 		const when = 1
 
-		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+		const sig = signUpdateHash(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
 
 		await this.ppf.updateMany([TOKEN_1], [TOKEN_2], [formatRate(xrt)], [when], sig)
 
@@ -55,8 +41,8 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		const xrt = 4
 		const when = 1
 
-		const sig1 = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
-		const sig2 = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_3, xrt, when)
+		const sig1 = signUpdateHash(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+		const sig2 = signUpdateHash(OPERATOR_PK, TOKEN_1, TOKEN_3, xrt, when)
 
 		const bases = [TOKEN_1, TOKEN_1]
 		const quotes = [TOKEN_2, TOKEN_3]
@@ -80,7 +66,7 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		const xrt = 3
 		const when = 1
 
-		const data = computeUpdateCall(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+		const data = signAndEncodeUpdateCall(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
 
 		const tx = {
 			from: guy,
@@ -111,7 +97,7 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		const rates = [xrt, xrt]
 		const whens = [when, when]
 
-		const data = computeUpdateManyCall(OPERATOR_PK, bases, quotes, rates, whens)
+		const data = signAndEncodeUpdateManyCall(OPERATOR_PK, bases, quotes, rates, whens)
 
 		const tx = {
 			from: guy,
@@ -141,7 +127,7 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		const xrt = 1
 		const when = 3
 
-		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+		const sig = signUpdateHash(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
 		const v = sig.substr(-2) // 1b or 1c
 		const oldV = v == '1b' ? '00' : '01'
 		const oldSig = sig.substr(0, sig.length-2) + oldV
@@ -153,7 +139,7 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		const xrt = 2
 		const when = 1
 
-		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+		const sig = signUpdateHash(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
 
 		await this.ppf.setOperator(guy, { from: operatorOwner })
 		await assertRevert(() => {
@@ -166,46 +152,51 @@ contract('PPF, signature logic', ([operatorOwner, guy]) => {
 		const when = 1
 
 		const modifiedKey = OPERATOR_PK.replace('b9', 'b8') // change first byte
-		const sig = signUpdate(modifiedKey, TOKEN_1, TOKEN_2, xrt, when)
+		const sig = signUpdateHash(modifiedKey, TOKEN_1, TOKEN_2, xrt, when)
 
 		await assertRevert(() => {
 			return this.ppf.update(TOKEN_1, TOKEN_2, formatRate(xrt), when, sig)
 		})
 	})
 
-	it('fails if signed hash differs', async () => {
-		const xrt = 2
-		const when = 1
+	context('signature validity', () => {
+		const xrt = 4
+		const when = 6
+		const sig = signUpdateHash(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
 
-		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
+		it('succeeds on valid signature', async () => {
+			await this.ppf.update(TOKEN_1, TOKEN_2, formatRate(xrt), when, sig)
+			const [r, w] = await this.ppf.get.call(TOKEN_1, TOKEN_2)		
 
-		const modifiedWhen = when + 1
+			assert.equal(parseRate(r), xrt, 'rate should have been updated')
+			assert.equal(w, when, 'when should have been updated')
+		})
 
-		await assertRevert(() => {
-			return this.ppf.update(TOKEN_1, TOKEN_2, formatRate(xrt), modifiedWhen, sig)
+		const signatureDifferTests = [
+			{
+				title: 'base and quote are swapped',
+				args: [TOKEN_2, TOKEN_1, formatRate(xrt), when, sig]
+			},
+			{
+				title: 'rate differs from signature',
+				args: [TOKEN_1, TOKEN_2, formatRate(xrt + 1), when, sig]
+			},
+			{
+				title: 'differs from signature',
+				args: [TOKEN_1, TOKEN_2, formatRate(xrt), when + 1, sig]
+			},
+			{
+				title: 'v is invalid',
+				args: [TOKEN_1, TOKEN_2, formatRate(xrt), when, sig.substr(0, sig.length-2) + 'ff']
+			},
+		]
+
+		signatureDifferTests.forEach(({ title, args }) => {
+			it(`fails if ${title}`, async () => {
+				await assertRevert(() => {
+					return this.ppf.update(...args)
+				})
+			})
 		})
 	})
-
-	it('fails if base and quote are swapped', async () => {
-		const xrt = 2
-		const when = 1
-
-		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
-
-		await assertRevert(() => {
-			return this.ppf.update(TOKEN_2, TOKEN_1, formatRate(xrt), when, sig)
-		})
-	})
-
-	it('fails if v is invalid', async () => {
-		const xrt = 1
-		const when = 3
-
-		const sig = signUpdate(OPERATOR_PK, TOKEN_1, TOKEN_2, xrt, when)
-		const badSig = sig.substr(0, sig.length-2) + 'ff' // invalid v
-
-		await assertRevert(() => {
-			return this.ppf.update(TOKEN_1, TOKEN_2, formatRate(xrt), when, badSig)
-		})
-	})	
 })
