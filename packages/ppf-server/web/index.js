@@ -1,7 +1,7 @@
 const express = require('express')
 const PPF = require('@aragon/ppf.js')
 
-module.exports = requestData => {
+module.exports = (config, requestData) => {
   const router = express.Router()
 
   router.use((req, res, next) => {
@@ -23,7 +23,7 @@ module.exports = requestData => {
     data.forEach(({ when }, i) => data[i].date = new Date(1000 * when))
 
     res.render('rates', {
-      ppf: req.query.ppf || '0x',
+      ppf: req.query.ppf || config.defaultPPF(req.env) || '0x',
       calldata,
       rates: data,
     })
@@ -38,7 +38,7 @@ module.exports = requestData => {
     const calldata = PPF.encodeUpdateCall(data.baseToken, data.quoteToken, data.price, data.when, data.sig)
 
     res.render('rate', {
-      ppf: req.query.ppf || '0x',
+      ppf: req.query.ppf || config.defaultPPF(req.env) || '0x',
       date: new Date(1000 * data.when),
       calldata,
       ...data,

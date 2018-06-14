@@ -53,7 +53,7 @@ fetcher.start()
 const api = API(requestData) 
 app.use('/api', api)
 
-const web = Web(requestData)
+const web = Web(config, requestData)
 app.use(web)
 
 const port = process.env.PORT || 3000

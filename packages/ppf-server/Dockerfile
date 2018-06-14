@@ -1,0 +1,5 @@
+FROM node:8-onbuild
+
+ENV PORT 8080
+EXPOSE 8080
+ENV DOCKER_BUILD "true"
