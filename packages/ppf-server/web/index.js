@@ -18,7 +18,7 @@ module.exports = requestData => {
     const whens = data.map(p => p.when)
     const sigs = data.map(p => p.sig)
     
-    const calldata = PPF.encodeManyCall(bases, quotes, prices, whens, sigs)
+    const calldata = PPF.encodeUpdateManyCall(bases, quotes, prices, whens, sigs)
 
     data.forEach(({ when }, i) => data[i].date = new Date(1000 * when))
 
@@ -35,7 +35,7 @@ module.exports = requestData => {
       return res.status(404).send('rate not processed')
     }
 
-    const calldata = PPF.encodeCall(data.baseToken, data.quoteToken, data.price, data.when, data.sig)
+    const calldata = PPF.encodeUpdateCall(data.baseToken, data.quoteToken, data.price, data.when, data.sig)
 
     res.render('rate', {
       ppf: req.query.ppf || '0x',

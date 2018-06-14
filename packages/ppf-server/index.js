@@ -33,7 +33,7 @@ const fetcherUpdate = (err, { base, quote, price }) => {
   config.envs.forEach((env) => {
     const baseToken = getBaseToken(env)
     const quoteToken = getQuoteToken(env)
-    const sig = PPF.signUpdate(config.operatorKey, baseToken, quoteToken, when, price)
+    const sig = PPF.signUpdateHash(config.operatorKey, baseToken, quoteToken, when, price)
 
     db[env][pairId(base, quote)] = { base, quote, baseToken, quoteToken, when, price, sig }
   })
