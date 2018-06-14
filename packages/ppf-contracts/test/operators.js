@@ -1,4 +1,4 @@
-const { assertRevert } = require('./helpers/assertErrors')
+const { assertRevert } = require('@aragon/test-helpers/assertThrow')
 
 const PPF = artifacts.require('PPF')
 
@@ -31,6 +31,12 @@ contract('PPF, operators', ([_, operator, operatorOwner, guy]) => {
 					return this.ppf.setOperator(guy, { from: guy })
 				})
 			})
+
+			it('fails if updating to null', async () => {
+				await assertRevert(() => {
+					return this.ppf.setOperator(ZERO, { from: operatorOwner })
+				})
+			})
 		})
 
 		context('updating operator owner:', () => {
@@ -48,6 +54,12 @@ contract('PPF, operators', ([_, operator, operatorOwner, guy]) => {
 			it('fails if unauthorized', async () => {
 				await assertRevert(() => {
 					return this.ppf.setOperatorOwner(guy, { from: guy })
+				})
+			})
+
+			it('fails if updating to null', async () => {
+				await assertRevert(() => {
+					return this.ppf.setOperatorOwner(ZERO, { from: operatorOwner })
 				})
 			})
 		})

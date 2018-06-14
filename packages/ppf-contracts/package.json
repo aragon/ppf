@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/aragon/ppf#readme",
   "devDependencies": {
+    "@aragon/test-helpers": "^1.0.1",
     "solidity-coverage": "^0.5.4",
     "truffle": "^4.1.11"
   }

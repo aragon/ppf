@@ -1,5 +1,7 @@
 pragma solidity 0.4.24;
 
+// Using ECRecovery at OZ's commit ad12381549c4c0711c2f3310e9fb1f65d51c299c + added personalRecover function
+
 library ECRecovery {
   /**
    * @dev Recover signer address from a personal signed message by using his signature
