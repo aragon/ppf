@@ -1,10 +1,10 @@
 pragma solidity 0.4.24;
 
-import "./Feed.sol";
-import "./zep/ECRecovery.sol";
+import "./IFeed.sol";
+import "./open-zeppelin/ECRecovery.sol";
 
 
-contract PPF is Feed {
+contract PPF is IFeed {
     using ECRecovery for bytes32;
     
     struct Price {
@@ -17,7 +17,7 @@ contract PPF is Feed {
     address public operatorOwner;
 
     uint256 constant public ONE = 10 ** 18; // 10^18 is considered 1 in the price feed to allow for decimal calculations
-    bytes32 constant private PPF_v1_ID = 0x33a8ba7202230fa1cee2aac7bac322939edc7ba0a48b0989335a5f87a5770369; // keccak256("PPF-v1"); 
+    bytes32 constant public PPF_v1_ID = 0x33a8ba7202230fa1cee2aac7bac322939edc7ba0a48b0989335a5f87a5770369; // keccak256("PPF-v1"); 
     
     event SetRate(address indexed base, address indexed quote, uint256 xrt, uint64 when);
     event SetOperator(address indexed operator);

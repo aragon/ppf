@@ -6,7 +6,7 @@ const {
 	parseRate, 
 } = require('@aragon/ppf.js')
 
-const { assertRevert } = require('./helpers/assertErrors')
+const { assertRevert } = require('@aragon/test-helpers/assertThrow')
 
 const PPF = artifacts.require('PPF')
 
