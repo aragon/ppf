@@ -1,0 +1,26 @@
+{
+  "name": "@aragon/ppf.js",
+  "version": "1.0.0",
+  "description": "JS library for generating PPF update signatures",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aragon/ppf.git"
+  },
+  "author": "Aragon One AG",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/aragon/ppf/issues"
+  },
+  "homepage": "https://github.com/aragon/ppf#readme",
+  "dependencies": {
+    "@aragon/ppf-contracts": "^1.0.0",
+    "bignumber.js": "^2.0.7",
+    "eth-sig-util": "^1.4.2",
+    "web3-eth-abi": "^1.0.0-beta.34",
+    "web3-utils": "^1.0.0-beta.34"
+  }
+}
