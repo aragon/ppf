@@ -111,6 +111,8 @@ contract PPF is IFeed {
     * @param _operator Public key allowed to sign messages to update the pricefeed
     */
     function setOperator(address _operator) external {
+        // Allow the current operator to change the operator to avoid having to hassle the
+        // operatorOwner in cases where a node just wants to rotate its public key
         require(msg.sender == operator || msg.sender == operatorOwner);
         _setOperator(_operator);
     }
