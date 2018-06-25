@@ -9,5 +9,23 @@ What it allows is having a price feed that can be always up to date the moment i
 ## Setup
 
 ```
+git clone https://github.com/aragon/ppf.git
+cd ppf
 npm i
 ```
+
+## Packages
+
+This monorepo contains the following packages:
+
+- [ppf-contracts](./packages/ppf-contracts): The on-chain component of PPF and tests
+- [ppf.js](./packages/ppf.js): JS library used to generate price feed update signatures and transactions
+- [ppf-server](./packages/ppf-server): Background process that keeps prices updated and serves a REST API and server-generated webapp.
+
+## Tickers and token addresses
+
+Because PPF can provide exchange rates not only between tokens, but also ether or fiat currencies, the token addresses in a pair (base or quote) can be:
+
+- ERC20 asset: the token address will correspond to the address of the token in that chain.
+- Ether: the token address will be an address comprised of only 0s: `0x0000000000000000000000000000000000000000`
+- Fiat currency or other off-chain assets: It will the maxiumum address (2^160 or `0xffffff...`) minus the ASCII representation of the chars in the ticker. For example, EUR is `0xFfFfffFfffFfffFfFfFFfFFFFFFFffFfFfbAaAAD`. Example code for generating this can be found [here](https://github.com/aragon/ppf/blob/fc41cb5cd37ba00d4eb5ae7610c565e5db684218/packages/ppf-server/helpers/tokenFromTicker.js)
