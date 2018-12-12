@@ -17,8 +17,8 @@
     "build",
     "contracts"
   ],
-  "author": "Aragon One AG",
-  "license": "GPL-3.0",
+  "author": "Aragon One AG <contact@aragon.one>",
+  "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/aragon/ppf/issues"
   },
