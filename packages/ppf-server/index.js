@@ -13,8 +13,6 @@ app.set('view engine', 'handlebars')
 
 const config = require(process.env.CONFIG)
 
-const MAINNET = 'mainnet'
-
 let db = {}
 
 config.envs.forEach((env) => {
@@ -35,7 +33,9 @@ const fetcherUpdate = (err, { base, quote, price }) => {
   config.envs.forEach((env) => {
     const baseToken = getBaseToken(env)
     const quoteToken = getQuoteToken(env)
-    const sig = PPF.signUpdateHash(config.operatorKey, baseToken, quoteToken, price, when)
+    const key = config.operatorKey(env)
+
+    const sig = PPF.signUpdateHash(key, baseToken, quoteToken, price, when)
 
     db[env][pairId(base, quote)] = { base, quote, baseToken, quoteToken, when, price, sig }
   })
