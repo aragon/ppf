@@ -27,6 +27,6 @@
     "@aragon/ppf.js": "^1.0.0",
     "@aragon/test-helpers": "^1.0.1",
     "solidity-coverage": "^0.5.4",
-    "truffle": "^4.1.11"
+    "truffle": "4.1.14"
   }
 }
