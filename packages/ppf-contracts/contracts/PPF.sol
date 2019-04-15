@@ -2,9 +2,10 @@ pragma solidity 0.4.24;
 
 import "./IFeed.sol";
 import "./open-zeppelin/ECRecovery.sol";
+import "@aragon/os/contracts/common/TimeHelpers.sol";
 
 
-contract PPF is IFeed {
+contract PPF is IFeed, TimeHelpers {
     using ECRecovery for bytes32;
 
     struct Price {
@@ -45,7 +46,7 @@ contract PPF is IFeed {
         bytes32 pair = pairId(base, quote);
 
         // Ensure it is more recent than the current value (implicit check for > 0) and not a future date
-        require(when > feed[pair].when && when <= block.timestamp);
+        require(when > feed[pair].when && when <= getTimestamp());
         require(xrt > 0); // Make sure xrt is not 0, as the math would break (Dividing by 0 sucks big time)
         require(base != quote); // Assumption that currency units are fungible and xrt should always be 1
 
