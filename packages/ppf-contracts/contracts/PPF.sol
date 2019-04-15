@@ -12,7 +12,7 @@ contract PPF is IFeed {
         uint64 when;
     }
 
-    mapping (bytes32 => Price) private feed;
+    mapping (bytes32 => Price) internal feed;
     address public operator;
     address public operatorOwner;
 
@@ -145,7 +145,7 @@ contract PPF is IFeed {
     /**
     * @dev pairId returns a unique id for each pair, regardless of the order of base and quote
     */
-    function pairId(address base, address quote) private pure returns (bytes32) {
+    function pairId(address base, address quote) internal pure returns (bytes32) {
         bool pairOrdered = isPairOrdered(base, quote);
         address orderedBase = pairOrdered ? base : quote;
         address orderedQuote = pairOrdered ? quote : base;
@@ -156,13 +156,13 @@ contract PPF is IFeed {
     /**
     * @dev Compute xrt depending on base and quote order.
     */
-    function pairXRT(address base, address quote, uint128 xrt) private pure returns (uint128) {
+    function pairXRT(address base, address quote, uint128 xrt) internal pure returns (uint128) {
         bool pairOrdered = isPairOrdered(base, quote);
 
         return pairOrdered ? xrt : uint128((ONE**2 / uint256(xrt))); // If pair is not ordered, return the inverse
     }
 
-    function setHash(address base, address quote, uint128 xrt, uint64 when) private pure returns (bytes32) {
+    function setHash(address base, address quote, uint128 xrt, uint64 when) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(PPF_v1_ID, base, quote, xrt, when));
     }
 
