@@ -14,11 +14,11 @@ contract PPF is IFeed {
     string private constant ERROR_BAD_RATE_TIMESTAMP = "PPF_BAD_RATE_TIMESTAMP";
     string private constant ERROR_INVALID_RATE_VALUE = "PPF_INVALID_RATE_VALUE";
     string private constant ERROR_EQUAL_BASE_QUOTE = "PPF_EQUAL_BASE_QUOTE_ADDRESSES";
-    string private constant ERROR_BAD_BASE_ADDRESSES_LENGTH = "PPF_BAD_BASE_ADDRESSES_LENGTH";
-    string private constant ERROR_BAD_QUOTE_ADDRESSES_LENGTH = "PPF_BAD_QUOTE_ADDRESSES_LENGTH";
-    string private constant ERROR_BAD_RATE_VALUES_LENGTH = "PPF_BAD_RATE_VALUES_LENGTH";
-    string private constant ERROR_BAD_RATE_TIMESTAMPS_LENGTH = "PPF_BAD_RATE_TIMESTAMPS_LENGTH";
-    string private constant ERROR_BAD_SIGNATURES_LENGTH = "PPF_BAD_SIGNATURES_LENGTH";
+    string private constant ERROR_BASE_ADDRESSES_LENGTH_ZERO = "PPF_BASE_ADDRESSES_LEN_ZERO";
+    string private constant ERROR_QUOTE_ADDRESSES_LENGTH_MISMATCH = "PPF_QUOTE_ADDRESSES_LEN_MISMATCH";
+    string private constant ERROR_RATE_VALUES_LENGTH_MISMATCH = "PPF_RATE_VALUES_LEN_MISMATCH";
+    string private constant ERROR_RATE_TIMESTAMPS_LENGTH_MISMATCH = "PPF_RATE_TIMESTAMPS_LEN_MISMATCH";
+    string private constant ERROR_SIGNATURES_LENGTH_MISMATCH = "PPF_SIGNATURES_LEN_MISMATCH";
     string private constant ERROR_CAN_NOT_SET_OPERATOR = "PPF_CAN_NOT_SET_OPERATOR";
     string private constant ERROR_CAN_NOT_SET_OPERATOR_OWNER = "PPF_CAN_NOT_SET_OPERATOR_OWNER";
     string private constant ERROR_OPERATOR_ADDRESS_ZERO = "PPF_OPERATOR_ADDRESS_ZERO";
@@ -81,12 +81,12 @@ contract PPF is IFeed {
     * @param sigs Bytes array with the ordered concatenated signatures for the updates
     */
     function updateMany(address[] bases, address[] quotes, uint128[] xrts, uint64[] whens, bytes sigs) public {
-        require(bases.length != 0, ERROR_BAD_BASE_ADDRESSES_LENGTH);
-        require(bases.length == quotes.length, ERROR_BAD_QUOTE_ADDRESSES_LENGTH);
-        require(bases.length == xrts.length, ERROR_BAD_RATE_VALUES_LENGTH);
-        require(bases.length == whens.length, ERROR_BAD_RATE_TIMESTAMPS_LENGTH);
-        require(bases.length == sigs.length / 65, ERROR_BAD_SIGNATURES_LENGTH);
-        require(sigs.length % 65 == 0, ERROR_BAD_SIGNATURES_LENGTH);
+        require(bases.length != 0, ERROR_BASE_ADDRESSES_LENGTH_ZERO);
+        require(bases.length == quotes.length, ERROR_QUOTE_ADDRESSES_LENGTH_MISMATCH);
+        require(bases.length == xrts.length, ERROR_RATE_VALUES_LENGTH_MISMATCH);
+        require(bases.length == whens.length, ERROR_RATE_TIMESTAMPS_LENGTH_MISMATCH);
+        require(bases.length == sigs.length / 65, ERROR_SIGNATURES_LENGTH_MISMATCH);
+        require(sigs.length % 65 == 0, ERROR_SIGNATURES_LENGTH_MISMATCH);
 
         for (uint256 i = 0; i < bases.length; i++) {
             // Extract the signature for the update from the concatenated sigs
