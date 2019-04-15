@@ -105,6 +105,10 @@ contract('PPF, update logic', () => {
 			await assertRevert(() => {
 				return this.ppf.update(TOKEN_1, TOKEN_1, formatRate(2), 1, SIG)
 			})
+
+			// Assert that the rate is 1 if quote == base even if update reverts
+			const [ rate ] = await this.ppf.get.call(TOKEN_1, TOKEN_1)
+			assertBig(rate, 1)
 		})
 
 		it('fails if updating with past value', async () => {

@@ -96,6 +96,10 @@ contract PPF is IFeed {
     * @return XRT for base:quote and the timestamp when it was updated
     */
     function get(address base, address quote) public view returns (uint128, uint64) {
+        if (base == quote) {
+            return (uint128(ONE), uint64(block.timestamp));
+        }
+
         Price storage price = feed[pairId(base, quote)];
 
         // if never set, return 0.
