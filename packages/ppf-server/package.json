@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run start:prod",
-    "start:prod": "node index.js",
+    "start:prod": "NODE_ENV=production nodemon -q index.js",
     "start:example": "CONFIG=./config.example.js node index.js",
     "docker:build": "docker build --no-cache -t aragon/ppf-server ."
   },
@@ -22,7 +22,9 @@
   "homepage": "https://github.com/aragon/ppf#readme",
   "dependencies": {
     "@aragon/ppf.js": "^1.0.2",
+    "express": "^4.16.4",
     "express-handlebars": "^3.0.0",
+    "nodemon": "^1.18.11",
     "request": "^2.87.0",
     "web3-utils": "^1.0.0-beta.34"
   }
