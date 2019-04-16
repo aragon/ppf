@@ -4,16 +4,18 @@
   "description": "Contracts for passive pricefeed",
   "main": "index.js",
   "scripts": {
-    "test": "truffle test",
     "compile": "truffle compile --all",
+    "test": "truffle test",
     "coverage": "solidity-coverage",
-    "prepublish": "npm run compile"
+    "abi:extract": "truffle-extract --output abi/ --keys abi",
+    "prepublishOnly": "npm run compile && npm run abi:extract -- --no-compile"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/aragon/ppf.git"
   },
   "files": [
+    "abi",
     "build",
     "contracts"
   ],
@@ -28,6 +30,7 @@
     "@aragon/ppf.js": "^1.0.0",
     "@aragon/test-helpers": "^1.0.1",
     "solidity-coverage": "^0.5.4",
-    "truffle": "4.1.14"
+    "truffle": "4.1.14",
+    "truffle-extract": "^1.2.1"
   }
 }
