@@ -61,7 +61,7 @@ contract PPF is IFeed {
         // Ensure it is more recent than the current value (implicit check for > 0) and not a future date
         require(when > feed[pair].when && when <= block.timestamp, ERROR_BAD_RATE_TIMESTAMP);
         require(xrt > 0, ERROR_INVALID_RATE_VALUE); // Make sure xrt is not 0, as the math would break (Dividing by 0 sucks big time)
-        require(base != quote, ERROR_EQUAL_BASE_QUOTE); // Assumption that currency units are fungible and xrt should always be 1
+        require(base != quote, ERROR_EQUAL_BASE_QUOTE_ADDRESSES); // Assumption that currency units are fungible and xrt should always be 1
 
         bytes32 h = setHash(base, quote, xrt, when);
         require(h.personalRecover(sig) == operator, ERROR_BAD_SIGNATURE); // Make sure the update was signed by the operator
