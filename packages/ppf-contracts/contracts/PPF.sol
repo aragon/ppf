@@ -2,9 +2,10 @@ pragma solidity 0.4.24;
 
 import "./IFeed.sol";
 import "./open-zeppelin/ECRecovery.sol";
+import "@aragon/os/contracts/common/TimeHelpers.sol";
 
 
-contract PPF is IFeed {
+contract PPF is IFeed, TimeHelpers {
     using ECRecovery for bytes32;
 
     uint256 constant public ONE = 10 ** 18; // 10^18 is considered 1 in the price feed to allow for decimal calculations
@@ -59,7 +60,7 @@ contract PPF is IFeed {
         bytes32 pair = pairId(base, quote);
 
         // Ensure it is more recent than the current value (implicit check for > 0) and not a future date
-        require(when > feed[pair].when && when <= block.timestamp, ERROR_BAD_RATE_TIMESTAMP);
+        require(when > feed[pair].when && when <= getTimestamp(), ERROR_BAD_RATE_TIMESTAMP);
         require(xrt > 0, ERROR_INVALID_RATE_VALUE); // Make sure xrt is not 0, as the math would break (Dividing by 0 sucks big time)
         require(base != quote, ERROR_EQUAL_BASE_QUOTE_ADDRESSES); // Assumption that currency units are fungible and xrt should always be 1
 
@@ -111,7 +112,7 @@ contract PPF is IFeed {
     */
     function get(address base, address quote) public view returns (uint128, uint64) {
         if (base == quote) {
-            return (uint128(ONE), uint64(block.timestamp));
+            return (uint128(ONE), getTimestamp64());
         }
 
         Price storage price = feed[pairId(base, quote)];
