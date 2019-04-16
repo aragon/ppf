@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "compile": "truffle compile --all",
-    "test": "truffle test",
+    "test": "npm run compile && truffle test",
     "coverage": "solidity-coverage",
     "abi:extract": "truffle-extract --output abi/ --keys abi",
     "prepublishOnly": "npm run compile && npm run abi:extract -- --no-compile"
