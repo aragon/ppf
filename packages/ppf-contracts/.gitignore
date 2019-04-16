@@ -1,3 +1,4 @@
 build/*
 coverage
 coverage.json
+flattened_contracts

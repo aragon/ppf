@@ -1,8 +1,25 @@
-const PPFFactory = artifacts.require('PPFFactory')
+const logDeploy = require('@aragon/os/scripts/helpers/deploy-logger')
 
-module.exports = async callback => {
+const globalArtifacts = this.artifacts // Not injected unless called directly via truffle
+
+module.exports = async (
+  truffleExecCallback,
+  {
+    artifacts = globalArtifacts
+  } = {}
+) => {
+  const PPFFactory = artifacts.require('PPFFactory')
+
   const ppfFactory = await PPFFactory.new()
 
-  console.log(ppfFactory.address)
-  callback()
+  await logDeploy(ppfFactory)
+
+  if (typeof truffleExecCallback === 'function') {
+    // Called directly via `truffle exec`
+    truffleExecCallback()
+  } else {
+    return {
+      ppfFactory
+    }
+  }
 }
