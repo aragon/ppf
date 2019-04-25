@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/aragon/ppf#readme",
   "devDependencies": {
+    "@aragon/cli": "^5.6.2",
     "@aragon/os": "4.2.0",
     "@aragon/ppf.js": "^1.0.0",
     "@aragon/test-helpers": "^1.0.1",
