@@ -30,9 +30,9 @@ contract PPF is IFeed, TimeHelpers {
         uint64 when;
     }
 
-    mapping (bytes32 => Price) internal feed;
     address public operator;
     address public operatorOwner;
+    mapping (bytes32 => Price) internal feed;
 
     event SetRate(address indexed base, address indexed quote, uint256 xrt, uint64 when);
     event SetOperator(address indexed operator);
@@ -48,26 +48,66 @@ contract PPF is IFeed, TimeHelpers {
     }
 
     /**
+    * @notice Set operator public key to `_operator`
+    * @param _operator Public key allowed to sign messages to update the pricefeed
+    */
+    function setOperator(address _operator) external {
+        // Allow the current operator to change the operator to avoid having to hassle the
+        // operatorOwner in cases where a node just wants to rotate its public key
+        require(msg.sender == operator || msg.sender == operatorOwner, ERROR_CAN_NOT_SET_OPERATOR);
+        _setOperator(_operator);
+    }
+
+    /**
+    * @notice Set operator owner to `_operatorOwner`
+    * @param _operatorOwner Address of an account that can change the operator
+    */
+    function setOperatorOwner(address _operatorOwner) external {
+        require(msg.sender == operatorOwner, ERROR_CAN_NOT_SET_OPERATOR_OWNER);
+        _setOperatorOwner(_operatorOwner);
+    }
+
+    /**
+    * @param base Address for the base token in the feed
+    * @param quote Address for the quote token the base is denominated in
+    * @return XRT for base:quote and the timestamp when it was updated
+    */
+    function get(address base, address quote) public view returns (uint128, uint64) {
+        if (base == quote) {
+            return (uint128(ONE), getTimestamp64());
+        }
+
+        Price storage price = feed[_pairId(base, quote)];
+
+        // if never set, return 0.
+        if (price.when == 0) {
+            return (0, 0);
+        }
+
+        return (_pairXRT(base, quote, price.xrt), price.when);
+    }
+
+    /**
     * @notice Update the price for the `base + ':' + quote` feed with an exchange rate of `xrt / ONE` for time `when`
     * @dev If the number representation of base is lower than the one for quote, and update is cheaper, as less manipulation is required.
     * @param base Address for the base token in the feed
     * @param quote Address for the quote token the base is denominated in
     * @param xrt Exchange rate for base denominated in quote. 10^18 is considered 1 to allow for decimal calculations
     * @param when Timestamp for the exchange rate value
-    * @param sig Signature payload (EIP191) from operator, concatenated [  r  ][  s  ][v]. See setHash function for the hash calculation.
+    * @param sig Signature payload (EIP191) from operator, concatenated [  r  ][  s  ][v]. See _setHash function for the hash calculation.
     */
     function update(address base, address quote, uint128 xrt, uint64 when, bytes sig) public {
-        bytes32 pair = pairId(base, quote);
+        bytes32 pair = _pairId(base, quote);
 
         // Ensure it is more recent than the current value (implicit check for > 0) and not a future date
         require(when > feed[pair].when && when <= getTimestamp(), ERROR_BAD_RATE_TIMESTAMP);
         require(xrt > 0, ERROR_INVALID_RATE_VALUE); // Make sure xrt is not 0, as the math would break (Dividing by 0 sucks big time)
         require(base != quote, ERROR_EQUAL_BASE_QUOTE_ADDRESSES); // Assumption that currency units are fungible and xrt should always be 1
 
-        bytes32 h = setHash(base, quote, xrt, when);
+        bytes32 h = _setHash(base, quote, xrt, when);
         require(h.personalRecover(sig) == operator, ERROR_BAD_SIGNATURE); // Make sure the update was signed by the operator
 
-        feed[pair] = Price(pairXRT(base, quote, xrt), when);
+        feed[pair] = Price(_pairXRT(base, quote, xrt), when);
 
         emit SetRate(base, quote, xrt, when);
     }
@@ -105,46 +145,6 @@ contract PPF is IFeed, TimeHelpers {
         }
     }
 
-    /**
-    * @param base Address for the base token in the feed
-    * @param quote Address for the quote token the base is denominated in
-    * @return XRT for base:quote and the timestamp when it was updated
-    */
-    function get(address base, address quote) public view returns (uint128, uint64) {
-        if (base == quote) {
-            return (uint128(ONE), getTimestamp64());
-        }
-
-        Price storage price = feed[pairId(base, quote)];
-
-        // if never set, return 0.
-        if (price.when == 0) {
-            return (0, 0);
-        }
-
-        return (pairXRT(base, quote, price.xrt), price.when);
-    }
-
-    /**
-    * @notice Set operator public key to `_operator`
-    * @param _operator Public key allowed to sign messages to update the pricefeed
-    */
-    function setOperator(address _operator) external {
-        // Allow the current operator to change the operator to avoid having to hassle the
-        // operatorOwner in cases where a node just wants to rotate its public key
-        require(msg.sender == operator || msg.sender == operatorOwner, ERROR_CAN_NOT_SET_OPERATOR);
-        _setOperator(_operator);
-    }
-
-    /**
-    * @notice Set operator owner to `_operatorOwner`
-    * @param _operatorOwner Address of an account that can change the operator
-    */
-    function setOperatorOwner(address _operatorOwner) external {
-        require(msg.sender == operatorOwner, ERROR_CAN_NOT_SET_OPERATOR_OWNER);
-        _setOperatorOwner(_operatorOwner);
-    }
-
     function _setOperator(address _operator) internal {
         require(_operator != address(0), ERROR_OPERATOR_ADDRESS_ZERO);
         operator = _operator;
@@ -158,10 +158,10 @@ contract PPF is IFeed, TimeHelpers {
     }
 
     /**
-    * @dev pairId returns a unique id for each pair, regardless of the order of base and quote
+    * @dev Returns a unique id for each pair, regardless of the order of base and quote
     */
-    function pairId(address base, address quote) internal pure returns (bytes32) {
-        bool pairOrdered = isPairOrdered(base, quote);
+    function _pairId(address base, address quote) internal pure returns (bytes32) {
+        bool pairOrdered = _isPairOrdered(base, quote);
         address orderedBase = pairOrdered ? base : quote;
         address orderedQuote = pairOrdered ? quote : base;
 
@@ -171,17 +171,17 @@ contract PPF is IFeed, TimeHelpers {
     /**
     * @dev Compute xrt depending on base and quote order.
     */
-    function pairXRT(address base, address quote, uint128 xrt) internal pure returns (uint128) {
-        bool pairOrdered = isPairOrdered(base, quote);
+    function _pairXRT(address base, address quote, uint128 xrt) internal pure returns (uint128) {
+        bool pairOrdered = _isPairOrdered(base, quote);
 
         return pairOrdered ? xrt : uint128((ONE**2 / uint256(xrt))); // If pair is not ordered, return the inverse
     }
 
-    function setHash(address base, address quote, uint128 xrt, uint64 when) internal pure returns (bytes32) {
+    function _setHash(address base, address quote, uint128 xrt, uint64 when) internal pure returns (bytes32) {
         return keccak256(abi.encodePacked(PPF_v1_ID, base, quote, xrt, when));
     }
 
-    function isPairOrdered(address base, address quote) private pure returns (bool) {
+    function _isPairOrdered(address base, address quote) private pure returns (bool) {
         return base < quote;
     }
 }
