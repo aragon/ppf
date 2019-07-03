@@ -68,19 +68,11 @@ contract PPF is IFeed, TimeHelpers {
     }
 
     /**
-
-    * @return The minimum rate precision used for the exchange rates
-    */
-    function ratePrecision() external pure returns (uint256) {
-        return ONE;
-    }
-
-    /**
     * @param base Address for the base token in the feed
     * @param quote Address for the quote token the base is denominated in
     * @return XRT for base:quote and the timestamp when it was updated
     */
-    function get(address base, address quote) public view returns (uint128, uint64) {
+    function get(address base, address quote) external view returns (uint128, uint64) {
         if (base == quote) {
             return (uint128(ONE), getTimestamp64());
         }
@@ -93,6 +85,14 @@ contract PPF is IFeed, TimeHelpers {
         }
 
         return (_pairXRT(base, quote, price.xrt), price.when);
+    }
+
+    /**
+
+    * @return The minimum rate precision used for the exchange rates
+    */
+    function ratePrecision() external pure returns (uint256) {
+        return ONE;
     }
 
     /**
