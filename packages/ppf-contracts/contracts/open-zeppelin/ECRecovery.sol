@@ -3,6 +3,7 @@ pragma solidity 0.4.24;
 // Using ECRecovery from open-zeppelin@ad12381549c4c0711c2f3310e9fb1f65d51c299c + added personalRecover function
 // See https://github.com/OpenZeppelin/openzeppelin-solidity/blob/ad12381549c4c0711c2f3310e9fb1f65d51c299c/contracts/ECRecovery.sol
 
+
 library ECRecovery {
   /**
    * @dev Recover signer address from a personal signed message by using his signature

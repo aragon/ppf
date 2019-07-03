@@ -5,6 +5,7 @@ notifications:
 node_js:
   - '8'
 env:
+  - TASK=lint
   - TASK=test
 before_script:
   - npm prune
