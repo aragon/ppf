@@ -1,8 +1,18 @@
+# dependencies
 node_modules
-**/*/node_modules
-yarn*
-**/*/yarn*
-.DS_Store
-**/*/.DS_Store
+
+# coverage
+*/**/coverage
+*/**/coverageEnv
+*/**/coverage.json
+*/**/allFiredEvents
+*/**/scTopics
+
+# lerna
+lerna-debug.log
+
+# truffle build artifacts
+*/**/build
+
+# lock files
 package-lock.json
-**/*/package-lock.json

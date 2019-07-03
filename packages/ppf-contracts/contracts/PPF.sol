@@ -68,6 +68,7 @@ contract PPF is IFeed, TimeHelpers {
     }
 
     /**
+
     * @return The minimum rate precision used for the exchange rates
     */
     function ratePrecision() external pure returns (uint256) {
