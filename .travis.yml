@@ -7,6 +7,7 @@ node_js:
 env:
   - TASK=lint
   - TASK=test
+  - TASK=coverage
 before_script:
   - npm prune
 script: "npm run $TASK"
