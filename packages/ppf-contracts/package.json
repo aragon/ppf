@@ -6,7 +6,7 @@
   "scripts": {
     "compile": "truffle compile --all",
     "test": "npm run compile && truffle test",
-    "coverage": "solidity-coverage",
+    "coverage": "npm run compile && solidity-coverage",
     "lint": "solium --dir ./contracts",
     "abi:extract": "truffle-extract --output abi/ --keys abi",
     "prepublishOnly": "npm run compile && npm run abi:extract -- --no-compile"
@@ -30,6 +30,7 @@
     "@aragon/cli": "^5.6.2",
     "@aragon/os": "4.2.0",
     "@aragon/ppf.js": "^1.0.0",
+    "@aragon/apps-shared-migrations": "1.0.0",
     "@aragon/test-helpers": "^1.0.1",
     "solidity-coverage": "^0.5.4",
     "solium": "^1.2.3",
