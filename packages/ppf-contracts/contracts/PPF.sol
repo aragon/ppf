@@ -8,8 +8,8 @@ import "@aragon/os/contracts/common/TimeHelpers.sol";
 contract PPF is IFeed, TimeHelpers {
     using ECRecovery for bytes32;
 
-    uint256 constant public ONE = 10 ** 18; // 10^18 is considered 1 in the price feed to allow for decimal calculations
     bytes32 constant public PPF_v1_ID = 0x33a8ba7202230fa1cee2aac7bac322939edc7ba0a48b0989335a5f87a5770369; // keccak256("PPF-v1");
+    uint256 constant internal ONE = 10 ** 18; // 10^18 is considered 1 in the price feed to allow for decimal calculations
 
     string private constant ERROR_BAD_SIGNATURE = "PPF_BAD_SIGNATURE";
     string private constant ERROR_BAD_RATE_TIMESTAMP = "PPF_BAD_RATE_TIMESTAMP";
@@ -65,6 +65,14 @@ contract PPF is IFeed, TimeHelpers {
     function setOperatorOwner(address _operatorOwner) external {
         require(msg.sender == operatorOwner, ERROR_CAN_NOT_SET_OPERATOR_OWNER);
         _setOperatorOwner(_operatorOwner);
+    }
+
+    /**
+
+    * @return The minimum rate precision used for the exchange rates
+    */
+    function ratePrecision() external pure returns (uint256) {
+        return ONE;
     }
 
     /**
