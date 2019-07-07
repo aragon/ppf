@@ -1,0 +1,31 @@
+{
+  "name": "@aragon/ppf-server",
+  "version": "1.0.0",
+  "description": "Fetch, sign and serve crypto prices",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run start:prod",
+    "start:prod": "NODE_ENV=production nodemon -q index.js",
+    "start:example": "CONFIG=./config.example.js node index.js",
+    "docker:build": "docker build --no-cache -t aragon/ppf-server ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aragon/ppf.git"
+  },
+  "author": "Aragon One AG",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/aragon/ppf/issues"
+  },
+  "homepage": "https://github.com/aragon/ppf#readme",
+  "dependencies": {
+    "@aragon/ppf.js": "^1.0.2",
+    "express": "^4.16.4",
+    "express-handlebars": "^3.0.0",
+    "nodemon": "^1.18.11",
+    "request": "^2.87.0",
+    "web3-utils": "^1.0.0-beta.34"
+  }
+}

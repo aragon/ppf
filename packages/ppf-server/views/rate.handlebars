@@ -1,0 +1,7 @@
+<h3>{{ base }}:{{ quote }}</h3>
+<h4>{{ price }} {{ quote }}</h4>
+<p>Updated {{ date }}</p>
+
+<button id="send" onclick="sendTransaction()">Send update tx</button>
+
+{{> web3 ppf=ppf calldata=calldata }}

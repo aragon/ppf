@@ -1,6 +1,6 @@
 {
   "name": "@aragon/ppf.js",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "JS library for generating PPF update signatures",
   "main": "index.js",
   "scripts": {

@@ -1,0 +1,10 @@
+<h1>Feed</h1>
+{{#each rates}}
+  <h3>{{ base }}:{{ quote }}</h3>
+  <h4>{{ price }} {{ quote }}</h4>
+  <p>Updated {{ date }}</p>
+{{/each}}
+
+<button id="send" onclick="sendTransaction()">Send update all tx</button>
+
+{{> web3 ppf=ppf calldata=calldata }}
